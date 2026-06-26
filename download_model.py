@@ -7,10 +7,7 @@ MODEL_PATH = "models/model.h5"
 
 if not os.path.exists(MODEL_PATH):
     print("Downloading model...")
-    gdown.download(
-        id="10nGYGyXCUJI8Nbz3hPpRDb9H26lQeG8A",
-        output=MODEL_PATH,
-        quiet=False,
-    )
+    url = "https://drive.google.com/uc?id=10nGYGyXCUJI8Nbz3hPpRDb9H26lQeG8A"
+    gdown.download(url, MODEL_PATH, quiet=False)
 else:
     print("Model already exists.")
