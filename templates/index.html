@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NeuroScan AI — Brain Tumor Detection</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ── Design tokens (DESIGN.md) ── */
+    :root {
+      --color-text:        #1c1c1e;
+      --color-text-muted:  #555a6a;
+      --color-placeholder: #a5a8b5;
+      --color-bg:          #ffffff;
+      --color-border:      #c7cad5;
+      --color-ring:        rgb(224,226,232);
+      --color-blue:        #5b76fe;
+      --color-blue-press:  #2a41b6;
+      --color-success:     #00b473;
+      --color-coral-light: #ffc6c6;
+      --color-coral-dark:  #600000;
+      --color-teal-light:  #c3faf5;
+      --color-teal-dark:   #187574;
+      --color-rose:        #ffd8f4;
+      --color-orange:      #ffe6cd;
+      --color-red-light:   #fbd4d4;
+      --color-red-muted:   #e3c5c5;
+
+      --radius-sm:  8px;
+      --radius-md:  12px;
+      --radius-lg:  24px;
+      --radius-xl:  50px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans', sans-serif;
+      font-feature-settings: "liga" 0, "ss01", "ss04", "ss05";
+      background: var(--color-bg);
+      color: var(--color-text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 20px 80px;
+    }
+
+    /* ── Nav strip ── */
+    .topbar {
+      width: 100%;
+      max-width: 860px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 56px;
+    }
+
+    .logo {
+      font-size: 17.5px;
+      font-weight: 700;
+      letter-spacing: 0.175px;
+      color: var(--color-text);
+      text-decoration: none;
+    }
+
+    .logo span {
+      color: var(--color-blue);
+    }
+
+    .badge {
+      font-size: 10.5px;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted);
+      background: var(--color-teal-light);
+      padding: 4px 10px;
+      border-radius: var(--radius-xl);
+    }
+
+    /* ── Hero ── */
+    .hero {
+      max-width: 620px;
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .hero h1 {
+      font-size: 56px;
+      font-weight: 400;
+      line-height: 1.15;
+      letter-spacing: -1.68px;
+      color: var(--color-text);
+      margin-bottom: 18px;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--color-blue);
+    }
+
+    .hero p {
+      font-size: 18px;
+      font-weight: 400;
+      line-height: 1.45;
+      color: var(--color-text-muted);
+    }
+
+    /* ── Upload card ── */
+    .card {
+      width: 100%;
+      max-width: 560px;
+      background: var(--color-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--color-ring) 0px 0px 0px 1px;
+      padding: 40px 36px;
+    }
+
+    .upload-zone {
+      border: 2px dashed var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 40px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      background: #fafafa;
+      position: relative;
+    }
+
+    .upload-zone:hover,
+    .upload-zone:focus-within {
+      border-color: var(--color-blue);
+      background: #f0f3ff;
+    }
+
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .upload-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--color-rose);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .upload-label {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text);
+      letter-spacing: -0.16px;
+    }
+
+    .upload-sub {
+      font-size: 14px;
+      color: var(--color-placeholder);
+    }
+
+    .file-name {
+      font-size: 13px;
+      color: var(--color-blue);
+      font-weight: 600;
+      margin-top: 4px;
+      min-height: 18px;
+    }
+
+    .btn-primary {
+      margin-top: 24px;
+      width: 100%;
+      padding: 14px 24px;
+      background: var(--color-blue);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: 'Noto Sans', sans-serif;
+      font-size: 17.5px;
+      font-weight: 700;
+      letter-spacing: 0.175px;
+      line-height: 1.29;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-primary:hover  { background: var(--color-blue-press); }
+    .btn-primary:active { transform: scale(0.985); }
+
+    /* ── Result panel ── */
+    .result-panel {
+      width: 100%;
+      max-width: 560px;
+      margin-top: 32px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--color-ring) 0px 0px 0px 1px;
+    }
+
+    .result-header {
+      padding: 28px 32px 24px;
+    }
+
+    .result-header.no-tumor {
+      background: var(--color-teal-light);
+    }
+
+    .result-header.tumor {
+      background: var(--color-coral-light);
+    }
+
+    .result-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: -0.36px;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      margin-bottom: 10px;
+    }
+
+    .result-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .result-dot.green { background: var(--color-success); }
+    .result-dot.red   { background: var(--color-coral-dark); }
+
+    .result-title {
+      font-size: 24px;
+      font-weight: 400;
+      line-height: 1.15;
+      letter-spacing: -0.72px;
+      color: var(--color-text);
+    }
+
+    .result-title.no-tumor { color: var(--color-teal-dark); }
+    .result-title.tumor    { color: var(--color-coral-dark); }
+
+    .result-body {
+      background: var(--color-bg);
+      padding: 24px 32px 32px;
+    }
+
+    .confidence-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .confidence-label {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      font-weight: 400;
+    }
+
+    .confidence-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text);
+      letter-spacing: -0.16px;
+    }
+
+    .progress-track {
+      height: 6px;
+      background: #eef0f5;
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: var(--color-blue);
+      transition: width 0.5s ease;
+    }
+
+    .progress-fill.success { background: var(--color-success); }
+    .progress-fill.danger  { background: var(--color-coral-dark); }
+
+    .mri-preview {
+      width: 100%;
+      border-radius: var(--radius-md);
+      box-shadow: var(--color-ring) 0px 0px 0px 1px;
+      display: block;
+    }
+
+    /* ── Error state ── */
+    .error-banner {
+      width: 100%;
+      max-width: 560px;
+      margin-top: 20px;
+      background: var(--color-red-light);
+      border-radius: var(--radius-md);
+      padding: 18px 22px;
+      box-shadow: var(--color-ring) 0px 0px 0px 1px;
+    }
+
+    .error-banner strong {
+      display: block;
+      font-size: 16px;
+      font-weight: 600;
+      color: #7a0000;
+      margin-bottom: 4px;
+    }
+
+    .error-banner small {
+      font-size: 14px;
+      color: #a04040;
+    }
+
+
+    /* ── Footer note ── */
+    .footer-note {
+      margin-top: 56px;
+      font-size: 12px;
+      color: var(--color-placeholder);
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 576px) {
+      .hero h1   { font-size: 36px; letter-spacing: -1px; }
+      .card,
+      .result-panel,
+      .error-banner { padding-left: 20px; padding-right: 20px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Top bar -->
+  <nav class="topbar">
+    <a class="logo" href="#">Neuro<span>Scan</span></a>
+    <span class="badge">AI-Powered</span>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <h1>Brain Tumor<br><em>Detection</em></h1>
+    <p>Upload an MRI scan and get an instant AI-powered analysis. Supports glioma, meningioma, and pituitary tumor classification.</p>
+  </section>
+
+  <!-- Upload card -->
+  <div class="card">
+    <form method="POST" enctype="multipart/form-data" id="scan-form">
+
+      <div class="upload-zone" id="drop-zone">
+        <input type="file" name="file" accept="image/*" required id="file-input">
+        <div class="upload-icon">🧠</div>
+        <span class="upload-label">Drop MRI scan or click to browse</span>
+        <span class="upload-sub">JPEG, PNG, WEBP — max 10 MB</span>
+        <span class="file-name" id="file-name-display"></span>
+      </div>
+
+      <button type="submit" class="btn-primary">Analyze MRI</button>
+
+    </form>
+  </div>
+
+  <!-- Error -->
+  {% if error %}
+  <div class="error-banner">
+    <strong>{{ error }}</strong>
+    {% if reason %}<small>{{ reason }}</small>{% endif %}
+  </div>
+  {% endif %}
+
+
+  <!-- Result -->
+  {% if result %}
+  <div class="result-panel">
+
+    <div class="result-header {% if 'No Tumor' in result %}no-tumor{% else %}tumor{% endif %}">
+      <div class="result-tag">
+        <span class="result-dot {% if 'No Tumor' in result %}green{% else %}red{% endif %}"></span>
+        Scan Result
+      </div>
+      <div class="result-title {% if 'No Tumor' in result %}no-tumor{% else %}tumor{% endif %}">
+        {{ result }}
+      </div>
+    </div>
+
+    <div class="result-body">
+
+      <div class="confidence-row">
+        <span class="confidence-label">Confidence</span>
+        <span class="confidence-value">{{ confidence }}%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill {% if 'No Tumor' in result %}success{% else %}danger{% endif %}"
+             style="width: {{ confidence }}%"></div>
+      </div>
+
+      <img class="mri-preview" src="{{ file_path }}" alt="Uploaded MRI scan">
+
+    </div>
+  </div>
+  {% endif %}
+
+  <p class="footer-note">
+    For research and educational use only.<br>
+    Not a substitute for professional medical diagnosis.
+  </p>
+
+  <script>
+    const input   = document.getElementById('file-input');
+    const display = document.getElementById('file-name-display');
+
+    input.addEventListener('change', () => {
+      display.textContent = input.files.length ? input.files[0].name : '';
+    });
+  </script>
+
+</body>
+</html>
