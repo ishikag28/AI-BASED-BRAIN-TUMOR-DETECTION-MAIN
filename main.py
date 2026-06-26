@@ -21,6 +21,8 @@ app = Flask(__name__)
 # -------------------------------
 # LOAD MODEL (FINAL WORKING)
 # -------------------------------
+import download_model
+
 model = keras.models.load_model('models/model.h5', compile=False)
 
 # -------------------------------
