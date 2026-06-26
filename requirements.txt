@@ -56,8 +56,8 @@ requests==2.34.2
 rich==15.0.0
 setuptools==82.0.1
 six==1.17.0
-tensorboard==2.16.2
-tensorboard-data-server==0.7.2
+tensorboard==2.15.2
+tensorboard-data-server==0.7.1
 tensorflow==2.15.0
 termcolor==3.3.0
 tqdm==4.68.3
