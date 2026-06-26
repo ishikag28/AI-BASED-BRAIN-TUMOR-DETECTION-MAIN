@@ -1,9 +1,7 @@
 services:
   - type: web
-    name: brain-tumor-detection
+    name: AI-BASED-BRAIN-TUMOR-DETECTION-MAIN
     env: python
-    region: oregon
-    plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn main:app
-    runtime: python-3.11.9
+    pythonVersion: 3.10.13
